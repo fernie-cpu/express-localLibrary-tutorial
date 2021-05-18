@@ -39,7 +39,7 @@ exports.index = (req, res) => {
 exports.book_list = function (req, res) {
   Book.find({}, 'title author')
     .populate('author')
-    .execute((err, list_books) => {
+    .exec((err, list_books) => {
       if (err) {
         return next(err);
       }
