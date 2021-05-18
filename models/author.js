@@ -8,21 +8,21 @@ var AuthorSchema = new Schema({
   date_of_death: { type: Date },
 });
 
-// Virtaul for author's full name
-AuthorSchema.virtual('name').get(() => {
-  return `${this.family_name}, ${this.first_name}`;
+// Virtual for author's full name
+AuthorSchema.virtual('name').get(function () {
+  return this.family_name + ', ' + this.first_name;
 });
 
 // Virtual for author's lifespan
-AuthorSchema.virtual('name').get(() => {
+AuthorSchema.virtual('lifespan').get(function () {
   return (
     this.date_of_death.getYear() - this.date_of_birth.getYear()
   ).toString();
 });
 
 // Virtual for author's URL
-AuthorSchema.virtual('name').get(() => {
-  return `/catalog/author/${this._id}`;
+AuthorSchema.virtual('url').get(function () {
+  return '/catalog/author/' + this._id;
 });
 
 //Export model
