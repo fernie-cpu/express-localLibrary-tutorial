@@ -34,7 +34,7 @@ router.post('/book/:id/update', book_controller.book_update_post);
 router.get('/book/:id', book_controller.book_detail);
 
 // GET request for list all books items
-router.get('/book', book_controller.book_list);
+router.get('/books', book_controller.book_list);
 
 /// AUTHOR ROUTES ///
 
@@ -60,7 +60,7 @@ router.post('/author/:id/update', author_controller.author_update_post);
 router.get('/author/:id', author_controller.author_detail);
 
 // GET request for list of all authors
-router.get('/author', author_controller.author_list);
+router.get('/authors', author_controller.author_list);
 
 /// GENRE ROUTES ///
 
