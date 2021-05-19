@@ -1,6 +1,7 @@
 var Author = require('../models/author');
 var Book = require('../models/book');
 var async = require('async');
+const { body, validationResult } = require('express-validator');
 
 // display list of all authors
 exports.author_list = (req, res, next) => {
@@ -49,13 +50,68 @@ exports.author_detail = (req, res, next) => {
 };
 
 // display Author create from a GET
-exports.author_create_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: Author create GET');
+exports.author_create_get = (req, res, next) => {
+  res.render('author_form', { title: 'Create Author' });
 };
 
 // handle author create an POST
-exports.author_create_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: Author create POST');
+exports.author_create_post = (req, res, next) => {
+  // validate and sanitize fields
+  body('first_name')
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage('First name must be specified.')
+    .isAlphanumeric()
+    .withMessage('First name has non-alphanumeric characters.'),
+    body('family_name')
+      .trim()
+      .isLength({ min: 1 })
+      .escape()
+      .withMessage('Family name must be specified.')
+      .isAlphanumeric()
+      .withMessage('Family name has non-alphanumeric characters.'),
+    body('date_of_birth', 'Invalid date of birth')
+      .optional({ checkFalsy: true })
+      .isISO8601()
+      .toDate();
+  body('date_of_death', 'Invalid date of death')
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .toDate();
+
+  //process request after validation and sanitization
+  (res, req, next) => {
+    // extract the validation error from a request
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      //there are errors. render the form again with sanitized values/error messages
+      res.render('author_form', {
+        title: 'Create Author',
+        author: req.body,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      //data from form is valid
+
+      //create an author object with escaped and trimmed data
+      var author = new Author({
+        first_name: req.body.first_name,
+        family_name: req.body.family_name,
+        date_of_birth: req.body.date_of_birth,
+        date_of_death: req.body.date_of_death,
+      });
+      author.save((err) => {
+        if (err) {
+          return next(err);
+        }
+        //successful - redirect to new author record.
+        res.redirect(author.url);
+      });
+    }
+  };
 };
 
 // display Author delete form on GET
