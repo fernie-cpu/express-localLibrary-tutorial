@@ -54,7 +54,7 @@ exports.author_create_get = (req, res, next) => {
   res.render('author_form', { title: 'Create Author' });
 };
 
-// handle author create an POST
+// handle author create on POST
 exports.author_create_post = [
   // validate and sanitize fields
   body('first_name')
@@ -81,28 +81,28 @@ exports.author_create_post = [
     .toDate(),
 
   //process request after validation and sanitization
-  (res, req, next) => {
+  (req, res, next) => {
     // extract the validation error from a request
     const errors = validationResult(req);
+
+    //create an author object with escaped and trimmed data
+    var author = new Author({
+      first_name: req.body.first_name,
+      family_name: req.body.family_name,
+      date_of_birth: req.body.date_of_birth,
+      date_of_death: req.body.date_of_death,
+    });
 
     if (!errors.isEmpty()) {
       //there are errors. render the form again with sanitized values/error messages
       res.render('author_form', {
         title: 'Create Author',
-        author: req.body,
+        author: author,
         errors: errors.array(),
       });
       return;
     } else {
       //data from form is valid
-
-      //create an author object with escaped and trimmed data
-      var author = new Author({
-        first_name: req.body.first_name,
-        family_name: req.body.family_name,
-        date_of_birth: req.body.date_of_birth,
-        date_of_death: req.body.date_of_death,
-      });
       author.save((err) => {
         if (err) {
           return next(err);
